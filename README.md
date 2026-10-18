@@ -26,8 +26,8 @@ API RESTful desenvolvida para o gerenciamento de culturas agrícolas e seus resp
 **1. Clone o repositório e aceda à pasta do projeto:**
 
 ```bash
-git clone <URL_DO_REPOSITORIO_API>
-cd <NOME_DA_PASTA_API>
+git clone <https://github.com/MatheusWD2006/CULTURAS_AGRICOLAS_API>
+cd <CULTURAS_AGRICOLAS_API>
 ```
 
 **2. Instale as dependências:**
