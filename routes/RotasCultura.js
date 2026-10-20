@@ -9,11 +9,11 @@ const {
 
 const rotasCultura = new Router();
 
-rotasCultura.route('/Cultura')
+rotasCultura.route('/cultura')
     .get(getCulturas)
     .post(addCultura); 
 
-rotasCultura.route('/Cultura/:codigo')
+rotasCultura.route('/cultura/:codigo')
     .get(getCulturaPorCodigo)
     .put(updateCultura)    
     .delete(deleteCultura);

@@ -9,11 +9,11 @@ const {
 
 const rotasManejo = new Router();
 
-rotasManejo.route('/Manejo')
+rotasManejo.route('/manejo')
     .get(getManejos)
     .post(addManejo); 
 
-rotasManejo.route('/Manejo/:codigo')
+rotasManejo.route('/manejo/:codigo')
     .get(getManejoPorCodigo)
     .put(updateManejo)  
     .delete(deleteManejo);
