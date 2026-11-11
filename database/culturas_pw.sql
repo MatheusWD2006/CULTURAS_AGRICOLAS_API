@@ -26,3 +26,13 @@ CREATE TABLE manejos (
     data_manejo DATE NOT NULL DEFAULT CURRENT_DATE,
     FOREIGN KEY (cultura_id) REFERENCES culturas(id_cultura)
 );
+
+-- 4. Usuários
+CREATE TABLE users (
+    e_mail VARCHAR(50) NOT NULL PRIMARY KEY,
+    passw VARCHAR(20) NOT NULL,
+    modo CHAR(1) NOT NULL,
+    CHECK (modo = 'A' OR modo = 'U'),
+    contato VARCHAR(14) NOT NULL,
+    nome_user VARCHAR(50) NOT NULL
+)
