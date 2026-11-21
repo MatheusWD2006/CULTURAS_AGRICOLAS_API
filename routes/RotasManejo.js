@@ -6,16 +6,20 @@ const {
     deleteManejo,
     getManejoPorCodigo
 } = require('../controllers/ManejoController');
+const {
+    verificaJWT,
+    verificaAdmin
+} = require('../controllers/segurançaController');
 
 const rotasManejo = new Router();
 
 rotasManejo.route('/manejo')
-    .get(getManejos)
-    .post(addManejo); 
+    .get(verificaJWT, getManejos)
+    .post(verificaJWT, addManejo); 
 
 rotasManejo.route('/manejo/:codigo')
-    .get(getManejoPorCodigo)
-    .put(updateManejo)  
-    .delete(deleteManejo);
+    .get(verificaJWT, getManejoPorCodigo)
+    .put(verificaJWT, updateManejo)  
+    .delete(verificaJWT, verificaAdmin, deleteManejo);
 
 module.exports = rotasManejo;

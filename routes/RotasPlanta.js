@@ -1,5 +1,4 @@
 const { Router } = require('express');
-
 const {
     getPlantas,
     addPlanta,
@@ -7,16 +6,20 @@ const {
     deletePlanta,
     getPlantaPorCodigo
 } = require('../controllers/PlantaController');
+const {
+    verificaJWT,
+    verificaAdmin
+} = require('../controllers/segurançaController');
 
 const rotasPlanta = new Router();
 
 rotasPlanta.route('/planta')
-    .get(getPlantas)
-    .post(addPlanta);
+    .get(verificaJWT, getPlantas)
+    .post(verificaJWT, addPlanta);
 
 rotasPlanta.route('/planta/:codigo')
-    .get(getPlantaPorCodigo)
-    .put(updatePlanta)    
-    .delete(deletePlanta);
+    .get(verificaJWT, getPlantaPorCodigo)
+    .put(verificaJWT, updatePlanta)    
+    .delete(verificaJWT, verificaAdmin, deletePlanta);
 
 module.exports = rotasPlanta;

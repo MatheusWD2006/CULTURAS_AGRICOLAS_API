@@ -6,16 +6,20 @@ const {
     deleteCultura,
     getCulturaPorCodigo
 } = require('../controllers/CulturaController');
+const {
+    verificaJWT,
+    verificaAdmin
+} = require('../controllers/segurançaController');
 
 const rotasCultura = new Router();
 
 rotasCultura.route('/cultura')
-    .get(getCulturas)
-    .post(addCultura); 
+    .get(verificaJWT, getCulturas)
+    .post(verificaJWT, addCultura); 
 
 rotasCultura.route('/cultura/:codigo')
-    .get(getCulturaPorCodigo)
-    .put(updateCultura)    
-    .delete(deleteCultura);
+    .get(verificaJWT, getCulturaPorCodigo)
+    .put(verificaJWT, updateCultura)    
+    .delete(verificaJWT, verificaAdmin, deleteCultura);
 
 module.exports = rotasCultura;
