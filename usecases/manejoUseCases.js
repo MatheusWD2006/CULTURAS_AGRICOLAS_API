@@ -26,7 +26,14 @@ const validarManejoNaCultura = async (cultura_id, data_manejo) => {
 
 const getManejosDB = async () => {
   try {
-    const { rows } = await query("SELECT * FROM manejos ORDER BY id_manejo");
+    const { rows } = await query(
+      `SELECT m.id_manejo, m.cultura_id, m.tipo_manejo, m.descricao_manejo, m.data_manejo,
+              CONCAT('Cultura de ', p.nome_planta, ' - ', c.hectares, ' hectares') as cultura_nome
+       FROM manejos m
+       JOIN culturas c ON m.cultura_id = c.id_cultura
+       JOIN plantas p ON c.planta_id = p.id_planta
+       ORDER BY m.id_manejo`
+    );
 
     return rows.map(
       (manejo) =>
@@ -36,6 +43,7 @@ const getManejosDB = async () => {
           manejo.tipo_manejo,
           manejo.descricao_manejo,
           formatarDataSimples(manejo.data_manejo),
+          manejo.cultura_nome,
         ),
     );
   } catch (err) {
@@ -107,6 +115,9 @@ const updateManejoDB = async (body) => {
       formatarDataSimples(manejo.data_manejo),
     );
   } catch (err) {
+    if (err.code === "23503") {
+      throw `A cultura com o código ${body.cultura_id} não existe no cadastro.`;
+    }
     throw typeof err === "string" ? err : "Erro ao alterar o manejo: " + err;
   }
 };
@@ -132,8 +143,12 @@ const deleteManejoDB = async (codigo) => {
 const getManejoPorCodigoDB = async (codigo) => {
   try {
     const results = await query(
-      `SELECT * FROM manejos
-             WHERE id_manejo = $1`,
+      `SELECT m.id_manejo, m.cultura_id, m.tipo_manejo, m.descricao_manejo, m.data_manejo,
+              CONCAT('Cultura de ', p.nome_planta, ' - ', c.hectares, ' hectares') as cultura_nome
+       FROM manejos m
+       JOIN culturas c ON m.cultura_id = c.id_cultura
+       JOIN plantas p ON c.planta_id = p.id_planta
+       WHERE m.id_manejo = $1`,
       [codigo],
     );
 
@@ -148,6 +163,7 @@ const getManejoPorCodigoDB = async (codigo) => {
         manejo.tipo_manejo,
         manejo.descricao_manejo,
         formatarDataSimples(manejo.data_manejo),
+        manejo.cultura_nome,
       );
     }
   } catch (err) {

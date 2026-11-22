@@ -94,7 +94,10 @@ const deletePlantaDB = async (codigo) => {
             return "Planta removida com sucesso";
         }
     } catch (err) {
-        throw "Erro ao remover a planta: " + err;
+        if (err.code === "23503") {
+            throw `Não é possível remover a planta de código ${codigo} pois existem culturas vinculadas a ela.`;
+        }
+        throw typeof err === "string" ? err : "Erro ao remover a planta: " + err;
     }
 };
 

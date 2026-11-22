@@ -4,7 +4,12 @@ const { formatarDataSimples, validarIntervaloDatas } = require('../utils/dateUti
 
 const getCulturasDB = async () => {
   try {
-    const { rows } = await query("SELECT * FROM culturas ORDER BY id_cultura");
+    const { rows } = await query(
+      `SELECT c.id_cultura, c.planta_id, c.hectares, c.data_plantio, c.data_colheita, p.nome_planta as planta_nome
+       FROM culturas c
+       JOIN plantas p ON c.planta_id = p.id_planta
+       ORDER BY c.id_cultura`
+    );
 
     return rows.map(
       (cultura) =>
@@ -14,6 +19,7 @@ const getCulturasDB = async () => {
           cultura.hectares,
           formatarDataSimples(cultura.data_plantio),
           formatarDataSimples(cultura.data_colheita),
+          cultura.planta_nome,
         ),
     );
   } catch (err) {
@@ -37,18 +43,26 @@ const addCulturaDB = async (body) => {
 
     const cultura = results.rows[0];
 
+    // Busca o nome da planta para retorno completo
+    const plantaResult = await query(
+      `SELECT nome_planta FROM plantas WHERE id_planta = $1`,
+      [planta_id]
+    );
+    const planta_nome = plantaResult.rowCount > 0 ? plantaResult.rows[0].nome_planta : null;
+
     return new Cultura(
       cultura.id_cultura,
       cultura.planta_id,
       cultura.hectares,
       formatarDataSimples(cultura.data_plantio),
       formatarDataSimples(cultura.data_colheita),
+      planta_nome,
     );
   } catch (err) {
     if (err.code === "23503") {
       throw `A planta com o código ${body.planta_id} não existe no cadastro.`;
     }
-    // Se for um erro é lançado pelas validações de data, repassa diretamente a mensagem
+    // Se for um erro lançado pelas validações de data, repassa diretamente a mensagem
     throw typeof err === "string" ? err : "Erro ao inserir a cultura: " + err;
   }
 };
@@ -74,14 +88,25 @@ const updateCulturaDB = async (body) => {
 
     const cultura = results.rows[0];
 
+    // Busca o nome da planta para retorno completo
+    const plantaResult = await query(
+      `SELECT nome_planta FROM plantas WHERE id_planta = $1`,
+      [planta_id]
+    );
+    const planta_nome = plantaResult.rowCount > 0 ? plantaResult.rows[0].nome_planta : null;
+
     return new Cultura(
       cultura.id_cultura,
       cultura.planta_id,
       cultura.hectares,
       formatarDataSimples(cultura.data_plantio),
       formatarDataSimples(cultura.data_colheita),
+      planta_nome,
     );
   } catch (err) {
+    if (err.code === "23503") {
+      throw `A planta com o código ${body.planta_id} não existe no cadastro.`;
+    }
     throw typeof err === "string" ? err : "Erro ao alterar a cultura: " + err;
   }
 };
@@ -100,15 +125,20 @@ const deleteCulturaDB = async (codigo) => {
       return "Cultura removida com sucesso";
     }
   } catch (err) {
-    throw "Erro ao remover a cultura: " + err;
+    if (err.code === "23503") {
+      throw `Não é possível remover a cultura de código ${codigo} pois existem manejos vinculados a ela.`;
+    }
+    throw typeof err === "string" ? err : "Erro ao remover a cultura: " + err;
   }
 };
 
 const getCulturaPorCodigoDB = async (codigo) => {
   try {
     const results = await query(
-      `SELECT * FROM culturas
-             WHERE id_cultura = $1`,
+      `SELECT c.id_cultura, c.planta_id, c.hectares, c.data_plantio, c.data_colheita, p.nome_planta as planta_nome
+       FROM culturas c
+       JOIN plantas p ON c.planta_id = p.id_planta
+       WHERE c.id_cultura = $1`,
       [codigo],
     );
 
@@ -123,6 +153,7 @@ const getCulturaPorCodigoDB = async (codigo) => {
         cultura.hectares,
         formatarDataSimples(cultura.data_plantio),
         formatarDataSimples(cultura.data_colheita),
+        cultura.planta_nome,
       );
     }
   } catch (err) {
