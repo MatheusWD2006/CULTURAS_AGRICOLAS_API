@@ -36,3 +36,10 @@ CREATE TABLE users (
     contato VARCHAR(14) NOT NULL,
     nome_user VARCHAR(50) NOT NULL
 )
+
+
+INSERT INTO users (e_mail, passw, modo, contato, nome_user)
+VALUES ('admin@ifsul.edu.br', 'admin123', 'A', '(54)99999-0001', 'Admin Matheus')
+
+INSERT INTO users (e_mail, passw, modo, contato, nome_user)
+VALUES ('user@ifsul.edu.br', 'user123', 'U', '(54)99999-0002', 'Produtor Joao')
