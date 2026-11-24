@@ -109,13 +109,18 @@ const updateDadosUsuarioLogado = async (request, response) => {
 
 // Verificação do token JWT
 function verificaJWT(request, response, next) {
-    const token = request.headers['authorization'];
+    let token = request.headers['authorization'];
 
     if (!token) {
         return response.status(401).json({
             auth: false,
             message: 'Nenhum token recebido.'
         });
+    }
+
+    // Se for enviado no formato "Bearer <token>" (padrão de ferramentas como Postman), extrai apenas o token
+    if (token.startsWith('Bearer ') || token.startsWith('bearer ')) {
+        token = token.slice(7).trim();
     }
 
     jwt.verify(token, process.env.SECRET, function (err, decoded) {
